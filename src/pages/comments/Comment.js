@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { axiosRes } from "../../api/axiosDefaults";
 import Avatar from "../../components/Avatar";
 import { MoreDropdown } from "../../components/MoreDropdown";
 import { useCurrentUser } from "../../contexts/CurrentUserContext";
+import CommentEditForm from "./CommentEditForm";
 import styles from "../../styles/Comment.module.css";
 
 const Comment = (props) => {
@@ -17,7 +18,8 @@ const Comment = (props) => {
         setPost,
         setComments,
       } = props;
-
+    
+    const [showEditForm, setShowEditForm] = useState(false);
     const currentUser = useCurrentUser()
     const is_owner = currentUser?.username === owner;
 
@@ -48,12 +50,26 @@ const Comment = (props) => {
                 <Avatar src={profile_image} />
                 </Link>
                 <div className="media-body align-self-center ml-1">
-                <span className={styles.Owner}>{owner}</span>
-                <span className={styles.Date}>{updated_at}</span>
-                <p className="">{content}</p>
+                    <span className={styles.Owner}>{owner}</span>
+                    <span className={styles.Date}>{updated_at}</span>
+                    { showEditForm ? (
+                        <CommentEditForm
+                        id={id}
+                        profile_id={profile_id}
+                        content={content}
+                        profileImage={profile_image}
+                        setComments={setComments}
+                        setShowEditForm={setShowEditForm}
+                      />
+                    ) : (
+                        <p className="">{content}</p>
+                    ) }                
                 </div>
-                <span className="right" >{is_owner && (
-                    <MoreDropdown handleEdit={() => {}} handleDelete={handleDelete} />
+                <span className="right" >
+                    {is_owner && !showEditForm && (
+                      <MoreDropdown 
+                        handleEdit={() => setShowEditForm(true)} 
+                        handleDelete={handleDelete} />
                     )}</span>               
             </div>           
         </div>
